@@ -1,0 +1,41 @@
+Type listchar is table of varchar (1000) 
+Index by binary_integer;
+
+function analizestringname(name_r3 varchar2) return listchar
+Is
+listt listchar;
+fchar varchar2(1) ;
+comname varchar2(20) := null;
+corpos number;
+countchar number := 0;
+k number:=1;
+begin
+countchar := length(name_r3) ;
+corpos := instr(lower(name_r3), 'скважин', curpos) ;
+if (curpos != 0) then
+corpos := corpos + 7;
+if (corpos <= countchar) then
+for i in corpos..countchar
+loop
+fchar := substr(name_r3, i, 1) ;
+if (f_number(fchar) = 1) then
+comname := comnane || fchar;
+end if;
+if ((ASCII(fchar) >= 65 and ASCII(fchar) <= 90) or
+(ASCII(fchar) >= 97 and ASCII(fchar) <= 122) or
+(ASCII(fchar) >= 192 and ASCII(fchar) <= 255) and length(comname) > 0) then
+comname := comnane || fchar;
+end if;
+if ((fchar = ', ' or fchar = '. ' or fchar = ' ' or i = countchar) and length(comname) > 0) then
+listt(k) := comname;
+comname := null;
+k := k+1;
+end if;
+end loop;
+end if;
+end if;
+else
+listt (1) := replace(name_r3, '''', '') ;
+end if;
+return listt;
+end;
