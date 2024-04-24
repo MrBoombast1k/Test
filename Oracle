@@ -1,1 +1,42 @@
 
+CREATE OR REPLACE FUNCTION analizestringname(name_r3 varchar) 
+RETURNS listchar AS $$
+DECLARE
+    listt listchar;
+    fchar char(1);
+    comname varchar(20) := null;
+    curpos integer;
+    countchar integer := 0;
+    k integer := 1;
+BEGIN
+    countchar := length(name_r3);
+    curpos := strpos(lower(name_r3), 'куст');
+    IF (curpos = 1) THEN
+        curpos := strpos(lower(name_r3), 'скважин', curpos);
+        IF (curpos != 0) THEN
+            curpos := curpos + 7;
+            IF (curpos <= countchar) THEN
+                FOR i IN curpos..countchar LOOP
+                    fchar := substr(name_r3, i, 1);
+                    IF (f_number(fchar) = 1) THEN
+                        comname := comname || fchar;
+                    END IF;
+                    IF ((ASCII(fchar) >= 65 AND ASCII(fchar) <= 90) OR
+                        (ASCII(fchar) >= 97 AND ASCII(fchar) <= 122) OR
+                        (ASCII(fchar) >= 192 AND ASCII(fchar) <= 255) AND length(comname) > 0) THEN
+                        comname := comname || fchar;
+                    END IF;
+                    IF ((fchar = ', ' OR fchar = '. ' OR fchar = ' ' OR i = countchar) AND length(comname) > 0) THEN
+                        listt[k] := comname;
+                        comname := null;
+                        k := k+1;
+                    END IF;
+                END LOOP;
+            END IF;
+        END IF;
+    ELSE
+        listt[1] := replace(name_r3, '''', '');
+    END IF;
+    RETURN listt;
+END;
+$$ LANGUAGE plpgsql;
